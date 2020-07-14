@@ -15,7 +15,7 @@ spec:
     kind: JavaAutoInstrumentation
     listKind: JavaAutoInstrumentationList
     plural: javaautoinstrumentations
-    singular: javaautoinstrumentation
+    singular: javaautoinstrumentationoperator
   scope: Namespaced
   versions:
   - name: v1alpha1

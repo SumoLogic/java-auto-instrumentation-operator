@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: java-auto-instrumetation
+  name: java-auto-instrumetation-operator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: java-auto-instrumetation
+      name: java-auto-instrumetation-operator
   template:
     metadata:
       labels:
-        name: java-auto-instrumetation
+        name: java-auto-instrumetation-operator
     spec:
-      serviceAccountName: java-auto-instrumetation
+      serviceAccountName: java-auto-instrumetation-operator
       containers:
-        - name: java-auto-instrumetation
+        - name: java-auto-instrumetation-operator
           # Replace this with the built image name
           image: quay.io/pioter/java-auto-instrumentation-operator:v0.5
           command:
-          - java-auto-instrumetation
+          - java-auto-instrumetation-operator
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
@@ -30,4 +30,4 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
-              value: "java-auto-instrumetation"
+              value: "java-auto-instrumetation-operator"

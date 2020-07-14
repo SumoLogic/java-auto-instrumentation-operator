@@ -1,7 +1,7 @@
 apiVersion: java-auto-instr.sumologic.com/v1alpha1
 kind: JavaAutoInstrumentation
 metadata:
-  name: example-javaautoinstrumentation
+  name: example-javaautoinstrumentationoperator
 spec:
   # Add fields here
   javaOptions: ""

@@ -1,4 +1,4 @@
-package javaautoinstrumentation
+package javaautoinstrumentationoperator
 
 import (
 	"github.com/stretchr/testify/assert"

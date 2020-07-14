@@ -84,7 +84,7 @@ func main() {
 
 	ctx := context.Background()
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "java-auto-instrumetation-lock")
+	err = leader.Become(ctx, "java-auto-instrumetation-operator-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
