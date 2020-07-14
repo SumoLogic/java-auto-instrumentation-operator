@@ -5,7 +5,7 @@ ENV OPERATOR=/usr/local/bin/java-auto-instrumetation-operator \
     USER_NAME=java-auto-instrumetation-operator
 
 # install operator binary
-COPY build/_output/bin/java-auto-instrumetation-operator ${OPERATOR}
+COPY build/_output/bin/java-auto-instrumentation-operator ${OPERATOR}
 
 COPY build/bin /usr/local/bin
 RUN  /usr/local/bin/user_setup
