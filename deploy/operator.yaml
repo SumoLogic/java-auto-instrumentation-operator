@@ -16,7 +16,7 @@ spec:
       containers:
         - name: java-auto-instrumetation-operator
           # Replace this with the built image name
-          image: quay.io/pioter/java-auto-instrumentation-operator:v0.5
+          image: quay.io/pioter/java-auto-instrumentation-operator:v0.6
           command:
           - java-auto-instrumetation-operator
           imagePullPolicy: Always
