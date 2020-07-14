@@ -1,4 +1,4 @@
-module github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation
+module github.com/SumoLogic/java-auto-instrumentation-operator
 
 go 1.13
 

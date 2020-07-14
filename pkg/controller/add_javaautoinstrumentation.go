@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/pkg/controller/javaautoinstrumentation"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller/javaautoinstrumentation"
 )
 
 func init() {

@@ -17,7 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	javaautoinstrv1alpha1 "github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/pkg/apis/javaautoinstr/v1alpha1"
+	javaautoinstrv1alpha1 "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
 )
 
 const tracingServiceNameLabel = "auto-instr-service-name"

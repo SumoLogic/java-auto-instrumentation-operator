@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/pkg/apis/javaautoinstr/v1alpha1"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
 )
 
 func init() {

@@ -26,9 +26,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 
-	"github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/pkg/apis"
-	"github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/pkg/controller"
-	"github.com/SumoLogic/sumologic-kubernetes-collection/java-auto-instrumentation/version"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/version"
 )
 
 // Change below variables to serve metrics on different host or port.
