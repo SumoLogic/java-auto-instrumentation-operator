@@ -15,8 +15,7 @@ spec:
       serviceAccountName: java-auto-instrumetation-operator
       containers:
         - name: java-auto-instrumetation-operator
-          # Replace this with the built image name
-          image: quay.io/pioter/java-auto-instrumentation-operator:v0.6
+          image: sumologic/opentelemetry-collector-operator:v0.1.0
           command:
           - java-auto-instrumetation-operator
           imagePullPolicy: Always
