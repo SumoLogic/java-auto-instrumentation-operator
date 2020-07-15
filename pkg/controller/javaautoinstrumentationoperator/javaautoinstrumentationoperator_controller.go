@@ -27,7 +27,7 @@ const opentelemetryJarVolumeName = "ot-jars-volume"
 const opentelemetryJarMountPath = "/ot-jars"
 const opentelemetryCollectorHostLabel = "collector-host"
 const opentelemetryJarContainerName = "ot-jars-holder"
-const opentelemetryJarContainerImage = "quay.io/pioter/ot-jars-holder:v0.2"
+const opentelemetryJarContainerImage = "sumologic/opentelemetry-jars:v0.1.0"
 
 var log = logf.Log.WithName("controller_javaautoinstrumentation")
 
