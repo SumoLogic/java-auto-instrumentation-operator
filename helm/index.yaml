@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  java-auto-instrumentation-operator:
+  - apiVersion: v2
+    created: "2020-07-29T11:57:01.76899+02:00"
+    description: Kubernetes operator that automates instrumentation of Java applications
+    digest: 100c68d41c4778e22541811732b89c6a337f15f4a3b1e4ec042463bf6cca8f7a
+    name: java-auto-instrumentation-operator
+    type: application
+    urls:
+    - https://sumologic.github.io/java-auto-instrumentation-operator/java-auto-instrumentation-operator-0.0.1.tgz
+    version: 0.0.1
+generated: "2020-07-29T11:57:01.767224+02:00"
