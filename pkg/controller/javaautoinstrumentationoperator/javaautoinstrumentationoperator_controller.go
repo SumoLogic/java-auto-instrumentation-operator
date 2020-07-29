@@ -27,7 +27,9 @@ const opentelemetryJarVolumeName = "ot-jars-volume"
 const opentelemetryJarMountPath = "/ot-jars"
 const opentelemetryCollectorHostLabel = "collector-host"
 const opentelemetryJarContainerName = "ot-jars-holder"
-const opentelemetryJarContainerImage = "sumologic/opentelemetry-jars:v0.1.0"
+const opentelemetryJarVersion = "v0.2.0"
+const opentelemetryJarContainerImage = "sumologic/opentelemetry-jars:" + opentelemetryJarVersion
+const opentelemetryJavaagentJarName = "opentelemetry-javaagent-all.jar"
 
 var log = logf.Log.WithName("controller_javaautoinstrumentation")
 
@@ -195,14 +197,18 @@ func getAutoInstrumentationServiceName(reqLogger logr.Logger, deployment *appv1.
 	}
 }
 
+func getJavaagentPath() string {
+	return " -javaagent:" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + " "
+}
+
 func getJaegerConfiguration(serviceName string, existingJavaOptions string, collectorHost string) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
 			Name: "_JAVA_OPTIONS",
-			Value: existingJavaOptions + " -javaagent:" + opentelemetryJarMountPath + "/opentelemetry-auto-0.3.0.jar " +
-				"-Dota.exporter.jar=" + opentelemetryJarMountPath + "/opentelemetry-auto-exporters-jaeger-0.3.0.jar " +
-				"-Dota.exporter.jaeger.endpoint=" + collectorHost + ":14250 " +
-				"-Dota.exporter.jaeger.service.name=" + serviceName,
+			Value: existingJavaOptions + getJavaagentPath() +
+				"-Dota.exporter=jaeger " +
+				"-DJAEGER_ENDPOINT=" + collectorHost + ":14250 " +
+				"-DJAEGER_SERVICE_NAME=" + serviceName,
 		},
 	}
 }
@@ -211,9 +217,9 @@ func getOtlpConfiguration(serviceName string, existingJavaOptions string, collec
 	return []corev1.EnvVar{
 		{
 			Name: "_JAVA_OPTIONS",
-			Value: existingJavaOptions + " -javaagent:" + opentelemetryJarMountPath + "/opentelemetry-auto-0.3.0.jar " +
-				"-Dota.exporter.jar=" + opentelemetryJarMountPath + "/opentelemetry-auto-exporters-otlp-0.3.0.jar " +
-				"-Dota.exporter.otlp.endpoint=" + collectorHost + ":55680",
+			Value: existingJavaOptions + getJavaagentPath() +
+				"-Dota.exporter=otlp " +
+				"-Dotel.otlp.endpoint=" + collectorHost + ":55680",
 		},
 		{
 			Name:  "OTEL_RESOURCE_ATTRIBUTES",
