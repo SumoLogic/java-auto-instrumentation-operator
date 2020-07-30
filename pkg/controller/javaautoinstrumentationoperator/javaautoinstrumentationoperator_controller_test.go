@@ -168,10 +168,14 @@ func TestShouldBuildJaegerConfiguration(t *testing.T) {
 
 	// then
 	assert.Equal(t, 1, len(config))
+
 	assert.Equal(t, "_JAVA_OPTIONS", config[0].Name)
+	elements := strings.Split(config[0].Value, "-D")
 	assert.True(t, strings.HasPrefix(config[0].Value, existingOpts))
-	assert.True(t, strings.HasSuffix(config[0].Value, serviceName))
-	assert.True(t, strings.Contains(config[0].Value, collectorHost))
+	assert.True(t, strings.Contains(elements[0], getJavaagentPath()))
+	assert.Equal(t, "ota.exporter=jaeger ", elements[1])               // the trailing space is expected
+	assert.Equal(t, "JAEGER_ENDPOINT=jaeger-host:14250 ", elements[2]) // the trailing space is expected
+	assert.Equal(t, "JAEGER_SERVICE_NAME=super-app", elements[3])
 }
 
 func TestShouldBuildOtlpConfiguration(t *testing.T) {
@@ -185,11 +189,24 @@ func TestShouldBuildOtlpConfiguration(t *testing.T) {
 
 	// then
 	assert.Equal(t, 2, len(config))
+
 	assert.Equal(t, "_JAVA_OPTIONS", config[0].Name)
+	elements := strings.Split(config[0].Value, "-D")
 	assert.True(t, strings.HasPrefix(config[0].Value, existingOpts))
+	assert.True(t, strings.Contains(elements[0], getJavaagentPath()))
+	assert.Equal(t, "ota.exporter=otlp ", elements[1]) // the trailing space is expected
+	assert.Equal(t, "otel.otlp.endpoint=otlp-host:55680", elements[2])
+
 	assert.Equal(t, "OTEL_RESOURCE_ATTRIBUTES", config[1].Name)
-	assert.True(t, strings.HasSuffix(config[1].Value, serviceName))
-	assert.True(t, strings.Contains(config[0].Value, collectorHost))
+	assert.Equal(t, "service.name=super-app", config[1].Value)
+}
+
+func TestShouldBuildJavaagentPath(t *testing.T) {
+	// when
+	path := getJavaagentPath()
+
+	// then
+	assert.Equal(t, " -javaagent:/ot-jars/opentelemetry-javaagent-all.jar ", path)
 }
 
 func TestShouldChooseJaegerConfiguration(t *testing.T) {
