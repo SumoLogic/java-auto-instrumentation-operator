@@ -1,7 +1,7 @@
 #!/usr/local/bin/bash
 set -e
 
-VERSION="v0.3.0"
+VERSION="v0.2.0"
 
 echo "Building version $VERSION"
 docker build -t "sumologic/opentelemetry-jars:$VERSION" .
