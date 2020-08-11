@@ -10,6 +10,7 @@ The deployment needs to have following labels applied:
 * `should-auto-instrument` set to *true*
 * `auto-instrumentation-exporter` preferably set to `otlp`
 * `auto-instr-service-name` set to name the service should be presented in spans
+* `collector-host` set to host where spans need to be set
 
 For example:
 
@@ -23,6 +24,7 @@ metadata:
     should-auto-instrument: "true"
     auto-instrumentation-exporter: "otlp"
     auto-instr-service-name: "service-a"
+    collector-host: "collection-sumologic-otelcol.sumologic"
 ```
 
 ## Adding the Operator
