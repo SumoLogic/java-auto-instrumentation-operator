@@ -10,7 +10,7 @@ The deployment needs to have following labels applied:
 * `should-auto-instrument` set to *true*
 * `auto-instrumentation-exporter` preferably set to `otlp`
 * `auto-instr-service-name` set to name the service should be presented in spans
-* `collector-host` set to host where spans need to be set
+* `collector-host` set to host where spans need to be sent
 
 For example:
 
