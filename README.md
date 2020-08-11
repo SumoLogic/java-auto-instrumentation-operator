@@ -27,10 +27,10 @@ metadata:
 
 ## Adding the Operator
 
-The best way to install the operator is to use helm chart:
+The best way to install the operator is to use helm 3 chart:
 ```shell script
 helm repo add java-auto-instrumentation-operator https://sumologic.github.io/java-auto-instrumentation-operator
-helm install java-auto-instrumentation-operator/java-auto-instrumentation-operator --name operator --namespace operator-helm
+helm install operator java-auto-instrumentation-operator/java-auto-instrumentation-operator --namespace operator-helm
 ```
 This is helm 3 chart.
 In the example presented above I've assumed you want to install the operator in the `operator-helm` namespace
