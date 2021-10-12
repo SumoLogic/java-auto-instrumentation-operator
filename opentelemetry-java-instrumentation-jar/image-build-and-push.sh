@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 set -e
 
 VERSION="1.6.2"
