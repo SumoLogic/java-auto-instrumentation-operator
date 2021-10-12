@@ -20,7 +20,8 @@ jobs:
         id: verify-ot-jars
         with:
           files: |
-            opentelemetry-java-instrumentation-jar
+            opentelemetry-java-instrumentation-jar/image-build-and-push.sh
+            opentelemetry-java-instrumentation-jar/Dockerfile
 
       - name: Build and publish if changes observed
         if: steps.verify-ot-jars.outputs.files_changed == 'true'
