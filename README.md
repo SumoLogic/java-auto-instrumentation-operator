@@ -1,16 +1,17 @@
-# java-auto-instrumentation-operator
+# Sumo Logic OpenTelemetry Java Auto Instrumentation Kubernetes Operator
 
-This repo contains Kubernetes operator that allows auto instrumentation of Java applications. It does so by automatically injecting Java Auto Instrumentation agent and configuration
+This repo contains Kubernetes operator that allows auto instrumentation of Java applications. 
+It does so by automatically injecting Java Auto Instrumentation agent and configuration.
 
 # Installation
 
 ## Preparing the pods
 
 The deployment needs to have following labels applied:
-* `should-auto-instrument` set to *true*
-* `auto-instrumentation-exporter` preferably set to `otlp`
-* `auto-instr-service-name` set to name the service should be presented in spans
-* `collector-host` set to host where spans need to be sent
+* `sumo-enable-instrumentation` set to *true*
+* `sumo-traces-exporter` default set to `otlp`
+* `sumo-service-name` set to name the service should be presented in spans
+* `sumo-traces-collector-host` set to host where spans need to be sent
 
 For example:
 
@@ -21,10 +22,10 @@ metadata:
   name: service-a
   namespace: java-demo-app
   labels:
-    should-auto-instrument: "true"
-    auto-instrumentation-exporter: "otlp"
-    auto-instr-service-name: "service-a"
-    collector-host: "collection-sumologic-otelcol.sumologic"
+    sumo-enable-instrumentation: "true"
+    sumo-traces-exporter: "otlp"
+    sumo-service-name: "service-a"
+    sumo-traces-collector-host: "collection-sumologic-otelcol.sumologic"
 ```
 
 ## Adding the Operator
