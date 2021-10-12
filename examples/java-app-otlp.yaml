@@ -4,9 +4,9 @@ kind: Deployment
 metadata:
   name: java-app-otlp
   labels:
-          "should-auto-instrument": "true"
-          "auto-instrumentation-exporter": "otlp"
-          "auto-instr-service-name": "java-app-otlp-exp"
+          "sumo-enable-instrumentation": "true"
+          "sumo-traces-exporter": "otlp"
+          "sumo-service-name": "java-app-otlp-exp"
           app: java-app-otlp
 spec:
   selector:
