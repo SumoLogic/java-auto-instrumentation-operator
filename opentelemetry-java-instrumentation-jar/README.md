@@ -6,7 +6,7 @@ In this document you can find instructions how to publish the image.
 The image is hosted in AWS ECR in a4t4y2n3 (sumologic) organization https://gallery.ecr.aws/a4t4y2n3/opentelemetry-java-instrumentation-jar.
 
 # Version history
-- `1.6.2`  - contains OpenTelemetry Java Instrumentation JAR version `1.6.2`
+- `1.6.2`  - contains OpenTelemetry Java Instrumentation JAR version [`1.6.2`](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.6.2)
 
 # Before you start building
 - Make sure that `VERSION` in `image-build-and-push.sh` refers to the version 
