@@ -1,0 +1,50 @@
+name: Sumo Logic Java Auto Instrumentation Kubernetes Operator docker image builder
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+
+jobs:
+  buildAndPublishJavaAutoInstrumentationOperator:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.OPERATOR_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.OPERATOR_AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Extract tag
+        id: extract_tag
+        run: echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/tags/v})"
+
+      - name: Print tag
+        run: echo "${{ steps.extract_tag.outputs.tag }}"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+
+      - name: Set up Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.6.0
+
+      - name: Login to AWS ECR
+        run: aws ecr-public get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin public.ecr.aws/a4t4y2n3
+
+      - name: Build docker image
+        run: docker build -t public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} .
+
+      - name: Push versioned docker image
+        run: docker push public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }}
+
+      - name: Tag latest docker image
+        run: docker tag public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} \
+              public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:latest
+
+      - name: Push latest docker image
+        run: docker push public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:latest
