@@ -20,15 +20,19 @@ import (
 	javaautoinstrv1alpha1 "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
 )
 
-const tracingServiceNameLabel = "auto-instr-service-name"
-const needsAutoInstrumentationLabel = "should-auto-instrument"
-const autoInstrumentationExporterLabel = "auto-instrumentation-exporter"
-const opentelemetryJarVolumeName = "ot-jars-volume"
-const opentelemetryJarMountPath = "/ot-jars"
-const opentelemetryCollectorHostLabel = "collector-host"
-const opentelemetryJarContainerName = "ot-jars-holder"
-const opentelemetryJarVersion = "v0.2.0"
-const opentelemetryJarContainerImage = "sumologic/opentelemetry-jars:" + opentelemetryJarVersion
+const enableInstrumentationLabel = "sumo-enable-instrumentation"
+const serviceNameLabel = "sumo-service-name"
+
+const opentelemetryTracesExporterLabel = "sumo-traces-exporter"
+const opentelemetryTracesCollectorHostLabel = "sumo-traces-collector-host"
+
+const opentelemetryJarVolumeName = "sumo-ot-jar-volume"
+const opentelemetryJarMountPath = "/ot-jar"
+
+const opentelemetryJarContainerName = "sumo-ot-jar-holder"
+
+const opentelemetryJarVersion = "1.6.2"
+const opentelemetryJarContainerImage = "public.ecr.aws/a4t4y2n3/opentelemetry-java-instrumentation-jar:" + opentelemetryJarVersion
 const opentelemetryJavaagentJarName = "opentelemetry-javaagent-all.jar"
 
 var log = logf.Log.WithName("controller_javaautoinstrumentation")
@@ -107,15 +111,15 @@ func (r *ReconcileJavaAutoInstrumentation) Reconcile(request reconcile.Request) 
 
 	for _, deployment := range existingDeployments.Items {
 		reqLogger.Info("Processing", "deployment", deployment.Name)
-		if needsAutoInstrumentation(&deployment) {
+		if needsInstrumentation(&deployment) {
 			if !hasJavaOptionsEnvVarWithAutoInstrumentation(deployment.Spec.Template.Spec.Containers) {
 				reqLogger.Info("Containers do not have _JAVA_OPTIONS env var with auto instrumentation",
 					"Deployment", deployment.Name)
-				exporter := getAutoInstrumentationExporterOrDefault(reqLogger, &deployment)
-				collectorHost := getCollectorHostOrDefault(&deployment, exporter)
-				tracingServiceName := getAutoInstrumentationServiceName(reqLogger, &deployment)
-				deployment.Spec.Template.Spec = mergePodSpec(&deployment.Spec.Template.Spec, tracingServiceName,
-					exporter, collectorHost)
+				tracesExporter := getTracesExporterOrDefault(reqLogger, &deployment)
+				tracesCollectorHost := getTracesCollectorHostOrDefault(&deployment, tracesExporter)
+				serviceName := getServiceName(reqLogger, &deployment)
+				deployment.Spec.Template.Spec = mergePodSpec(&deployment.Spec.Template.Spec, serviceName,
+					tracesExporter, tracesCollectorHost)
 				err = r.client.Update(context.TODO(), &deployment)
 				if err != nil {
 					reqLogger.Error(err, "Failed to update deployment", "Deployment", deployment.Name)
@@ -133,8 +137,8 @@ func (r *ReconcileJavaAutoInstrumentation) Reconcile(request reconcile.Request) 
 	return reconcile.Result{}, nil
 }
 
-func getCollectorHostOrDefault(deployment *appv1.Deployment, exporter string) string {
-	providedHost, ok := deployment.Labels[opentelemetryCollectorHostLabel]
+func getTracesCollectorHostOrDefault(deployment *appv1.Deployment, exporter string) string {
+	providedHost, ok := deployment.Labels[opentelemetryTracesCollectorHostLabel]
 	if ok {
 		return providedHost
 	} else {
@@ -158,33 +162,33 @@ func getJavaOptions(containers []corev1.Container) (string, bool) {
 	return "", false
 }
 
-func needsAutoInstrumentation(deployment *appv1.Deployment) bool {
-	shouldAutoInstrument, ok := deployment.Labels[needsAutoInstrumentationLabel]
+func needsInstrumentation(deployment *appv1.Deployment) bool {
+	enableInstrumentation, ok := deployment.Labels[enableInstrumentationLabel]
 	if ok {
-		return shouldAutoInstrument == "true"
+		return enableInstrumentation == "true"
 	}
 	return false
 }
 
-func getAutoInstrumentationExporterOrDefault(reqLogger logr.Logger, deployment *appv1.Deployment) string {
-	exporter, ok := deployment.Labels[autoInstrumentationExporterLabel]
+func getTracesExporterOrDefault(reqLogger logr.Logger, deployment *appv1.Deployment) string {
+	exporter, ok := deployment.Labels[opentelemetryTracesExporterLabel]
 	if ok {
-		if exporter == "jaeger" || exporter == "otlp" {
+		if exporter == "jaeger" || exporter == "otlp" || exporter == "zipkin" {
 			return exporter
 		} else {
-			reqLogger.Info("Unknown exporter "+exporter+", will default to jaeger", "Deployment",
+			reqLogger.Info("Unknown exporter "+exporter+", will default to OTLP/HTTP protobuf", "Deployment",
 				deployment.Name)
-			return "jaeger"
+			return "otlp"
 		}
 	} else {
-		reqLogger.Info("No exporter set, will default to jaeger", "Deployment",
+		reqLogger.Info("No exporter set, will default to OTLP/HTTP protobuf", "Deployment",
 			deployment.Name)
-		return "jaeger"
+		return "otlp"
 	}
 }
 
-func getAutoInstrumentationServiceName(reqLogger logr.Logger, deployment *appv1.Deployment) string {
-	name, ok := deployment.Labels[tracingServiceNameLabel]
+func getServiceName(reqLogger logr.Logger, deployment *appv1.Deployment) string {
+	name, ok := deployment.Labels[serviceNameLabel]
 	if ok {
 		reqLogger.Info("Using label for tracing service name")
 		return name
@@ -201,29 +205,39 @@ func getJavaagentPath() string {
 	return " -javaagent:" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + " "
 }
 
-func getJaegerConfiguration(serviceName string, existingJavaOptions string, collectorHost string) []corev1.EnvVar {
+func getJaegerConfiguration(existingJavaOptions string, collectorHost string, serviceName string) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
 			Name: "_JAVA_OPTIONS",
 			Value: existingJavaOptions + getJavaagentPath() +
-				"-Dota.exporter=jaeger " +
-				"-DJAEGER_ENDPOINT=" + collectorHost + ":14250 " +
-				"-DJAEGER_SERVICE_NAME=" + serviceName,
+				"-Dotel.traces.exporter=jaeger " +
+				"-Dotel.exporter.jaeger.endpoint=http://" + collectorHost + ":14250 " +
+				"-Dotel.service.name=" + serviceName + " ",
 		},
 	}
 }
 
-func getOtlpConfiguration(serviceName string, existingJavaOptions string, collectorHost string) []corev1.EnvVar {
+func getZipkinConfiguration(existingJavaOptions string, collectorHost string, serviceName string) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
 			Name: "_JAVA_OPTIONS",
 			Value: existingJavaOptions + getJavaagentPath() +
-				"-Dota.exporter=otlp " +
-				"-Dotel.otlp.endpoint=" + collectorHost + ":55680",
+				"-Dotel.traces.exporter=zipkin " +
+				"-Dotel.exporter.zipkin.endpoint=http://" + collectorHost + ":9411/api/v2/spans " +
+				"-Dotel.service.name=" + serviceName + " ",
 		},
+	}
+}
+
+func getTracesOtlpConfiguration(existingJavaOptions string, collectorHost string, serviceName string) []corev1.EnvVar {
+	return []corev1.EnvVar{
 		{
-			Name:  "OTEL_RESOURCE_ATTRIBUTES",
-			Value: "service.name=" + serviceName,
+			Name: "_JAVA_OPTIONS",
+			Value: existingJavaOptions + getJavaagentPath() +
+				"-Dotel.traces.exporter=otlp " +
+				"-Dotel.exporter.otlp.traces.endpoint=http://" + collectorHost + ":55681/v1/traces " +
+				"-Dotel.service.name=" + serviceName + " " +
+				"-Dotel.exporter.otlp.protocol=http/protobuf ",
 		},
 	}
 }
@@ -231,10 +245,13 @@ func getOtlpConfiguration(serviceName string, existingJavaOptions string, collec
 func getConfiguration(exporter string, serviceName string, existingJavaOptions string,
 	collectorHost string) []corev1.EnvVar {
 
-	if exporter == "otlp" {
-		return getOtlpConfiguration(serviceName, existingJavaOptions, collectorHost)
+	if exporter == "zipkin" {
+		return getZipkinConfiguration(existingJavaOptions, collectorHost, serviceName)
+
+	} else if exporter == "jaeger" {
+		return getJaegerConfiguration(existingJavaOptions, collectorHost, serviceName)
 	} else {
-		return getJaegerConfiguration(serviceName, existingJavaOptions, collectorHost)
+		return getTracesOtlpConfiguration(existingJavaOptions, collectorHost, serviceName)
 	}
 }
 
