@@ -42,8 +42,7 @@ jobs:
         run: docker push public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }}
 
       - name: Tag latest docker image
-        run: docker tag public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} \
-              public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:latest
+        run: docker tag public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:latest
 
       - name: Push latest docker image
         run: docker push public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:latest
