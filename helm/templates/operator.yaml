@@ -15,7 +15,7 @@ spec:
       serviceAccountName: java-auto-instrumetation-operator
       containers:
         - name: java-auto-instrumetation-operator
-          image: sumologic/opentelemetry-collector-operator:{{ .Values.images.operator }}
+          image: public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:{{ .Values.images.operator }}
           command:
           - java-auto-instrumetation-operator
           imagePullPolicy: Always

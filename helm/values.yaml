@@ -1,4 +1,3 @@
 images:
-  operator: v0.3.0
-  ot-jars: v0.2.0
-
+  operator: v0.0.2
+  opentelemetry-java-instrumentatio-jar: 1.6.2
