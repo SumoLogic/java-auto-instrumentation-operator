@@ -36,14 +36,14 @@ jobs:
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a4t4y2n3
 
       - name: Build docker image
-        run: docker build -t public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} .
+        run: docker build -t public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} .
 
       - name: Push versioned docker image
-        run: docker push public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }}
+        run: docker push public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }}
 
       - name: Tag latest docker image
-        run: docker tag public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} \
-              public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:latest
+        run: docker tag public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} \
+              public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:latest
 
       - name: Push latest docker image
-        run: docker push public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:latest
+        run: docker push public.ecr.aws/a4t4y2n3/opentelemetry-java-auto-instrumentation-kubernetes-operator:latest
