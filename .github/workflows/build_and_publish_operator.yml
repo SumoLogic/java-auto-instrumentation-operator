@@ -33,8 +33,7 @@ jobs:
         uses: docker/setup-buildx-action@v1.6.0
 
       - name: Login to AWS ECR
-        run: aws ecr-public get-login-password --region us-east-1 \
-            | docker login --username AWS --password-stdin public.ecr.aws/a4t4y2n3
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a4t4y2n3
 
       - name: Build docker image
         run: docker build -t public.ecr.aws/a4t4y2n3/sumologic-java-auto-instrumentation-kubernetes-operator:${{ steps.extract_tag.outputs.tag }} .
