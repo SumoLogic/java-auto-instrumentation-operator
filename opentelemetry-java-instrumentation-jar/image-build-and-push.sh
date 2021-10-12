@@ -22,7 +22,7 @@ echo "Pushing version ${VERSION} to docker hub (assuming that you are logged in)
 docker push "${VERSION_TAG}"
 
 echo "Pushing version 'latest' to docker hub"
-docker tag "${VERSION_TAG}" "${REPOSITORY}:latest"
+docker tag "${VERSION_TAG}" "${LATEST_TAG}"
 docker push "${LATEST_TAG}"
 
 echo "Done. Please remember to update both version in this script and in README"
