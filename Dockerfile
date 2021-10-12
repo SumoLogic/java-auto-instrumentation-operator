@@ -26,9 +26,6 @@ ENV OPERATOR=/usr/local/bin/java-auto-instrumetation-operator \
 # install operator binary
 COPY --from=builder /workspace/manager ${OPERATOR}
 
-COPY build/bin /usr/local/bin
-RUN  /usr/local/bin/user_setup
+USER ${USER_UID}:${USER_UID}
 
-ENTRYPOINT ["/usr/local/bin/entrypoint"]
-
-USER ${USER_UID}
+ENTRYPOINT ["/usr/local/bin/java-auto-instrumetation-operator"]
