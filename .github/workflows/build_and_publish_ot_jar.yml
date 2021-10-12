@@ -16,14 +16,14 @@ jobs:
         uses: actions/checkout@v2.3.4
 
       - name: Verify changes in opentelemetry-java-instrumentation-jar directory
-        uses: tj-actions/verify-changed-files@v8
-        id: verify-ot-jars
+        uses: tj-actions/changed-files@v10
+        id: verify-if-files-changed
         with:
           files: |
             opentelemetry-java-instrumentation-jar/image-build-and-push.sh
             opentelemetry-java-instrumentation-jar/Dockerfile
 
       - name: Build and publish if changes observed
-        if: steps.verify-ot-jars.outputs.files_changed == 'true'
+        if: steps.verify-if-files-changed.outputs.only_changed == 'true'
         run: |
           cd opentelemetry-java-instrumentation-jar && ./image-build-and-push.sh
