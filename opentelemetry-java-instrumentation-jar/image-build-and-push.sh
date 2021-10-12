@@ -6,7 +6,7 @@ AWS_ACCOUNT_NUMBER="663229565520"
 AWS_REGION=us-west-2
 REGISTRY="${AWS_ACCOUNT_NUMBER}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-#TODO Change "a4t4y2n3" to "sumologic" after alias migration in the AWS ECR
+# TODO Change "a4t4y2n3" to "sumologic" after alias migration in the AWS ECR
 REPOSITORY="a4t4y2n3/opentelemetry-java-instrumentation-jar"
 
 VERSION_TAG="${REGISTRY}/${REPOSITORY}:${VERSION}"
