@@ -37,8 +37,8 @@ var log = logf.Log.WithName("controller_javaautoinstrumentation")
 
 // ReconcileJavaAutoInstrumentation reconciles a JavaAutoInstrumentation object
 type ReconcileJavaAutoInstrumentation struct {
-	client client.Client
-	scheme *runtime.Scheme
+	client.Client
+	Scheme *runtime.Scheme
 }
 
 // Reconcile reads that state of the cluster for a JavaAutoInstrumentation object and makes changes based on the state read
@@ -53,7 +53,7 @@ func (r *ReconcileJavaAutoInstrumentation) Reconcile(ctx context.Context, reques
 	reqLogger.Info("Reconciling JavaAutoInstrumentation")
 
 	existingDeployments := &appv1.DeploymentList{}
-	err := r.client.List(context.TODO(), existingDeployments, &client.ListOptions{Namespace: request.Namespace})
+	err := r.List(context.TODO(), existingDeployments, &client.ListOptions{Namespace: request.Namespace})
 	if err != nil {
 		reqLogger.Error(err, "failed to list existing deployments")
 		return reconcile.Result{}, err
@@ -70,7 +70,7 @@ func (r *ReconcileJavaAutoInstrumentation) Reconcile(ctx context.Context, reques
 				serviceName := getServiceName(reqLogger, &deployment)
 				deployment.Spec.Template.Spec = mergePodSpec(&deployment.Spec.Template.Spec, serviceName,
 					tracesExporter, tracesCollectorHost)
-				err = r.client.Update(context.TODO(), &deployment)
+				err = r.Update(context.TODO(), &deployment)
 				if err != nil {
 					reqLogger.Error(err, "Failed to update deployment", "Deployment", deployment.Name)
 					return reconcile.Result{}, err

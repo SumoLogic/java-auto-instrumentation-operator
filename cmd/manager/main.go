@@ -11,15 +11,15 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 
-	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis"
-	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller"
 	"github.com/SumoLogic/java-auto-instrumentation-operator/version"
 
 	javaautoinstrv1alpha1 "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
+	operator "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller/javaautoinstrumentationoperator"
 )
 
 var (
@@ -80,20 +80,35 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&operator.ReconcileJavaAutoInstrumentation{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		log.Error(err, "unable to create controller", "controller", "JavaAutoInstrumentation")
+		os.Exit(1)
+	}
+
 	log.Info("Registering Components.")
 
-	// Setup Scheme for all resources
-	if err := apis.AddToScheme(mgr.GetScheme()); err != nil {
-		log.Error(err, "")
+	// // Setup Scheme for all resources
+	// if err := apis.AddToScheme(mgr.GetScheme()); err != nil {
+	// 	log.Error(err, "")
+	// 	os.Exit(1)
+	// }
+	
+	// // Setup all Controllers
+	// if err := controller.AddToManager(mgr); err != nil {
+	// 	log.Error(err, "")
+	// 	os.Exit(1)
+	// }
+	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+		log.Error(err, "unable to set up health check")
 		os.Exit(1)
 	}
-
-	// Setup all Controllers
-	if err := controller.AddToManager(mgr); err != nil {
-		log.Error(err, "")
+	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+		log.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
-
 	log.Info("Starting the Cmd.")
 
 	// Start the Cmd
