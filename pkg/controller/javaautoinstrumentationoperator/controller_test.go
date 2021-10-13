@@ -134,7 +134,7 @@ func TestShouldBuildOtJarsVolumeMount(t *testing.T) {
 	volumeMount := getOtJarsVolumeMount()
 
 	// expect
-	assert.False(t, volumeMount.ReadOnly)
+	assert.True(t, volumeMount.ReadOnly)
 	assert.Equal(t, "sumo-ot-jar-volume", volumeMount.Name)
 	assert.Equal(t, "/ot-jar", volumeMount.MountPath)
 }

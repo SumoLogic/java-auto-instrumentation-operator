@@ -2,20 +2,18 @@ package javaautoinstrumentationoperator
 
 import (
 	"context"
-	"github.com/go-logr/logr"
 	"strings"
 	"time"
+
+	"github.com/go-logr/logr"
 
 	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	javaautoinstrv1alpha1 "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
 )
@@ -37,56 +35,8 @@ const opentelemetryJavaagentJarName = "opentelemetry-javaagent-all.jar"
 
 var log = logf.Log.WithName("controller_javaautoinstrumentation")
 
-// Add creates a new JavaAutoInstrumentation Controller and adds it to the Manager. The Manager will set fields on the Controller
-// and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileJavaAutoInstrumentation{client: mgr.GetClient(), scheme: mgr.GetScheme()}
-}
-
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("javaautoinstrumentationoperator-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
-
-	// Watch for changes to primary resource JavaAutoInstrumentation
-	err = c.Watch(&source.Kind{Type: &javaautoinstrv1alpha1.JavaAutoInstrumentation{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
-		return err
-	}
-
-	// Watch for changes to secondary resource Pods and requeue the owner JavaAutoInstrumentation
-	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &javaautoinstrv1alpha1.JavaAutoInstrumentation{},
-	})
-	if err != nil {
-		return err
-	}
-
-	log.Info("Watching all deployments")
-	err = c.Watch(&source.Kind{Type: &appv1.Deployment{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
-		log.Error(err, "Failed to watch all deployments")
-		return err
-	}
-	return nil
-}
-
-// blank assignment to verify that ReconcileJavaAutoInstrumentation implements reconcile.Reconciler
-var _ reconcile.Reconciler = &ReconcileJavaAutoInstrumentation{}
-
 // ReconcileJavaAutoInstrumentation reconciles a JavaAutoInstrumentation object
 type ReconcileJavaAutoInstrumentation struct {
-	// This client, initialized using mgr.Client() above, is a split client
-	// that reads objects from the cache and writes to the apiserver
 	client client.Client
 	scheme *runtime.Scheme
 }
@@ -96,7 +46,7 @@ type ReconcileJavaAutoInstrumentation struct {
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *ReconcileJavaAutoInstrumentation) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+func (r *ReconcileJavaAutoInstrumentation) Reconcile(ctx context.Context, request ctrl.Request) (ctrl.Result, error) {
 	now := time.Now().Format(time.RFC3339)
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name,
 		"Timestamp", now)
@@ -135,6 +85,13 @@ func (r *ReconcileJavaAutoInstrumentation) Reconcile(request reconcile.Request) 
 		}
 	}
 	return reconcile.Result{}, nil
+}
+
+// SetupWithManager sets up the controller with the Manager.
+func (r *ReconcileJavaAutoInstrumentation) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&javaautoinstrv1alpha1.JavaAutoInstrumentation{}).
+		Complete(r)
 }
 
 func getTracesCollectorHostOrDefault(deployment *appv1.Deployment, exporter string) string {
@@ -202,7 +159,7 @@ func getServiceName(reqLogger logr.Logger, deployment *appv1.Deployment) string 
 }
 
 func getJavaagentPath() string {
-	return " -javaagent:\"" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + "\" "
+	return " -javaagent:" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + " "
 }
 
 func getJaegerConfiguration(existingJavaOptions string, collectorHost string, serviceName string) []corev1.EnvVar {
@@ -269,6 +226,7 @@ func getOtJarsVolumeMount() corev1.VolumeMount {
 	return corev1.VolumeMount{
 		Name:      opentelemetryJarVolumeName,
 		MountPath: opentelemetryJarMountPath,
+		ReadOnly:  true,
 	}
 }
 
