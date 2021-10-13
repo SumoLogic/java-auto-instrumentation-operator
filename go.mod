@@ -3,15 +3,13 @@ module github.com/SumoLogic/java-auto-instrumentation-operator
 go 1.17
 
 require (
-	github.com/go-logr/logr v1.1.0
+	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	k8s.io/api v0.22.2
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2
 	sigs.k8s.io/controller-runtime v0.10.2
 )
-
-require github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
@@ -26,8 +24,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/zapr v1.1.0 // indirect
+	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
@@ -64,7 +63,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/apiextensions-apiserver v0.22.2 // indirect
 	k8s.io/component-base v0.22.2 // indirect
-	k8s.io/klog/v2 v2.20.0 // indirect
+	k8s.io/klog/v2 v2.9.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210929172449-94abcedd1aa4 // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
