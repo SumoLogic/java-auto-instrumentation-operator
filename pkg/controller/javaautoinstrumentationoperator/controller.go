@@ -202,7 +202,7 @@ func getServiceName(reqLogger logr.Logger, deployment *appv1.Deployment) string 
 }
 
 func getJavaagentPath() string {
-	return " -javaagent:" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + " "
+	return " -javaagent:\"" + opentelemetryJarMountPath + "/" + opentelemetryJavaagentJarName + "\" "
 }
 
 func getJaegerConfiguration(existingJavaOptions string, collectorHost string, serviceName string) []corev1.EnvVar {
