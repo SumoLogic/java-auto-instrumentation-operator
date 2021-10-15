@@ -61,9 +61,9 @@ func TestShouldBuildOtlpConfiguration(t *testing.T) {
 	elements := strings.Split(config[0].Value, "-D")
 	assert.True(t, strings.HasPrefix(config[0].Value, existingOpts))
 	assert.True(t, strings.Contains(elements[0], getJavaagentPath()))
-	assert.Equal(t, "otel.traces.exporter=otlp ", elements[1])                                           // the trailing space is expected
-	assert.Equal(t, "otel.exporter.otlp.traces.endpoint=http://otlp-host:55681/v1/traces ", elements[2]) // the trailing space is expected
-	assert.Equal(t, "otel.service.name="+serviceName+" ", elements[3])                                   // the trailing space is expected
+	assert.Equal(t, "otel.traces.exporter=otlp ", elements[1])                                // the trailing space is expected
+	assert.Equal(t, "otel.exporter.otlp.traces.endpoint=http://otlp-host:4317 ", elements[2]) // the trailing space is expected
+	assert.Equal(t, "otel.service.name="+serviceName+" ", elements[3])                        // the trailing space is expected
 }
 
 func TestShouldChooseOtlpConfiguration(t *testing.T) {

@@ -48,7 +48,7 @@ func TestShouldFindThatDeploymentDoesntNeedAutoInstrumentation(t *testing.T) {
 
 func TestShouldFindJavaOptionsWithOpenTelemetryForOneContainer(t *testing.T) {
 	// given
-	container := buildContainer("_JAVA_OPTIONS", "-javaagent:/ot-jar/opentelemetry-auto-0.3.0.jar")
+	container := buildContainer("_JAVA_OPTIONS", "-javaagent:/jar/opentelemetry-javaagent-all.jar")
 
 	// when
 	hasAutoInstrJavaOpt := hasJavaOptionsEnvVarWithAutoInstrumentation([]corev1.Container{*container})
@@ -109,7 +109,7 @@ func TestShouldBuildJavaagentPath(t *testing.T) {
 	path := getJavaagentPath()
 
 	// then
-	assert.Equal(t, " -javaagent:/ot-jar/opentelemetry-javaagent-all.jar ", path)
+	assert.Equal(t, " -javaagent:/jar/opentelemetry-javaagent-all.jar ", path)
 }
 
 func TestShouldCopyWithoutJavaOptions(t *testing.T) {
@@ -134,9 +134,9 @@ func TestShouldBuildOtJarsVolumeMount(t *testing.T) {
 	volumeMount := getOtJarsVolumeMount()
 
 	// expect
-	assert.True(t, volumeMount.ReadOnly)
+	assert.False(t, volumeMount.ReadOnly)
 	assert.Equal(t, "sumo-ot-jar-volume", volumeMount.Name)
-	assert.Equal(t, "/ot-jar", volumeMount.MountPath)
+	assert.Equal(t, "/jar", volumeMount.MountPath)
 }
 
 func TestShouldBuildOtJarsVolume(t *testing.T) {
