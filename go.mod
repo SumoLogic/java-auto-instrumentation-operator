@@ -3,7 +3,7 @@ module github.com/SumoLogic/java-auto-instrumentation-operator
 go 1.17
 
 require (
-	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/go-logr/logr v0.4.0
 	github.com/stretchr/testify v1.7.0
 	k8s.io/api v0.22.2
 	k8s.io/apimachinery v0.22.2
