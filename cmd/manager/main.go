@@ -19,7 +19,9 @@ import (
 	"github.com/SumoLogic/java-auto-instrumentation-operator/version"
 
 	javaautoinstrv1alpha1 "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis/javaautoinstr/v1alpha1"
-	operator "github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller/javaautoinstrumentationoperator"
+
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/apis"
+	"github.com/SumoLogic/java-auto-instrumentation-operator/pkg/controller"
 )
 
 var (
@@ -67,40 +69,42 @@ func main() {
 
 	// Create a new manager to provide shared dependencies and start components
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
-		HealthProbeBindAddress: probeAddr,
-		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "java-auto-instrumetation-operator-lock",
-		Namespace:              namespace,
+		Scheme:                  scheme,
+		MetricsBindAddress:      metricsAddr,
+		Port:                    9443,
+		HealthProbeBindAddress:  probeAddr,
+		LeaderElection:          enableLeaderElection,
+		LeaderElectionID:        "java-auto-instrumetation-operator-lock",
+		LeaderElectionNamespace: namespace,
+		Namespace:               namespace,
 	})
 	if err != nil {
 		log.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	if err = (&operator.ReconcileJavaAutoInstrumentation{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		log.Error(err, "unable to create controller", "controller", "JavaAutoInstrumentation")
-		os.Exit(1)
-	}
+	// if err = (&operator.ReconcileJavaAutoInstrumentation{
+	// 	Client: mgr.GetClient(),
+	// 	Scheme: mgr.GetScheme(),
+	// }).SetupWithManager(mgr); err != nil {
+	// 	log.Error(err, "unable to create controller", "controller", "JavaAutoInstrumentation")
+	// 	os.Exit(1)
+	// }
 
 	log.Info("Registering Components.")
 
-	// // Setup Scheme for all resources
-	// if err := apis.AddToScheme(mgr.GetScheme()); err != nil {
-	// 	log.Error(err, "")
-	// 	os.Exit(1)
-	// }
-	
-	// // Setup all Controllers
-	// if err := controller.AddToManager(mgr); err != nil {
-	// 	log.Error(err, "")
-	// 	os.Exit(1)
-	// }
+	// Setup Scheme for all resources
+	if err := apis.AddToScheme(mgr.GetScheme()); err != nil {
+		log.Error(err, "")
+		os.Exit(1)
+	}
+
+	// Setup all Controllers
+	if err := controller.AddToManager(mgr); err != nil {
+		log.Error(err, "")
+		os.Exit(1)
+	}
+
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		log.Error(err, "unable to set up health check")
 		os.Exit(1)
