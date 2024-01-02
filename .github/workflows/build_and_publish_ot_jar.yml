@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Verify changes in opentelemetry-java-instrumentation-jar directory
-        uses: tj-actions/changed-files@v10
+        uses: tj-actions/changed-files@v41
         id: verify-if-files-changed
         with:
           files: |
